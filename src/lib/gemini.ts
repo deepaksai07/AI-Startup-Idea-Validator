@@ -3,31 +3,26 @@ import { GoogleGenAI } from '@google/genai';
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
 
 const systemInstruction = `You are an expert startup consultant.
-
-Analyze the given startup idea and return a structured JSON object with:
-
+Analyze the given startup idea and return a strictly valid JSON object.
+JSON Schema:
 {
-  "problem": "",
-  "customer": "",
-  "market": "",
+  "problem": "One sentence defining the core problem",
+  "customer": "Exactly who suffers from this",
+  "market": "TAM/SAM calculation or market size description",
   "competitor": [
-    { "name": "", "difference": "" },
-    { "name": "", "difference": "" },
-    { "name": "", "difference": "" }
+    { "name": "Direct/Indirect Competitor", "difference": "Your unique value prop vs them" }
   ],
-  "tech_stack": [],
-  "risk_level": "",
-  "profitability_score": 0,
-  "justification": ""
+  "tech_stack": ["Tool1", "Tool2", "Tool3", "Tool4"],
+  "risk_level": "Low/Medium/High",
+  "profitability_score": 0-100,
+  "justification": "2-3 sentences explaining the score"
 }
 
-Rules:
-- Return ONLY JSON
-- No extra text
-- Keep answers concise and realistic
-- competitor must be exactly 3
-- tech_stack must be 4-6 items
-- profitability_score 0-100`;
+Constraints:
+- Return ONLY the JSON object.
+- Competitor array must have exactly 3 items.
+- Tech stack must have 4-6 modern, relevant tools.
+- Be critical but constructive.`;
 
 export async function analyzeWithGemini(prompt: string) {
   const response = await ai.models.generateContent({

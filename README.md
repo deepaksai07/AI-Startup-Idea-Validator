@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 AI Startup Idea Validator
 
-## Getting Started
+**Validate your next big idea in seconds with AI-driven market analysis.**
 
-First, run the development server:
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdeepaksai07%2FAI-Startup-Idea-Validator)
+
+AI Startup Idea Validator is a high-performance web application that helps entrepreneurs refine and validate their startup concepts. By leveraging Google Gemini or Groq (Llama-3), it provides deep insights into problem-solution fit, target customers, market size, competitors, and technical feasibility.
+
+---
+
+## ✨ Features
+
+- **Instant Analysis**: Get a comprehensive startup report in under 5 seconds.
+- **Dual AI Support**: Choose between Google Gemini 1.5 Flash (default) or Groq Llama-3.
+- **Deep Insights**: Analysis covers Problem, Customer, Market, Competitors, and Tech Stack.
+- **Profitability Scoring**: Data-driven justification for market viability.
+- **Persistent Storage**: All ideas and analyses are saved for future reference.
+
+---
+
+## 🛠️ Tech Stack
+
+| Component | Technology |
+| :--- | :--- |
+| **Framework** | Next.js 15 (App Router) |
+| **Styling** | Tailwind CSS 4.0 + Framer Motion |
+| **Database** | Neon (PostgreSQL) |
+| **ORM** | Prisma |
+| **AI Providers** | Google Gemini / Groq (Llama-3) |
+| **Deployment** | Vercel |
+
+---
+
+## 🏗️ Architecture
+
+```mermaid
+graph TD
+    User([User]) --> UI[Next.js Frontend]
+    UI --> API[Next.js API Routes]
+    API --> DB[(Neon PostgreSQL)]
+    API --> AI{AI Provider}
+    AI -- Gemini --> GeminiAPI[Google Gemini API]
+    AI -- Groq --> GroqAPI[Groq API]
+    GeminiAPI --> API
+    GroqAPI --> API
+    API --> UI
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+
+- Node.js 18+
+- A Neon Database (or any PostgreSQL instance)
+- API Keys for Gemini or Groq
+
+### 2. Environment Setup
+
+Create a `.env` file in the root directory:
+
+```env
+DATABASE_URL="your_postgresql_url"
+AI_PROVIDER="gemini" # or "groq"
+GEMINI_API_KEY="your_key"
+GROQ_API_KEY="your_key"
+```
+
+### 3. Installation
+
+```bash
+npm install
+npx prisma generate
+npx prisma db push
+```
+
+### 4. Running Locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit `http://localhost:3000` to start validating.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📁 Project Structure
 
-## Learn More
+```text
+├── prisma/               # Database schema
+├── src/
+│   ├── app/              # Next.js App Router (Pages & API)
+│   ├── components/       # UI Components (Radix, Framer Motion)
+│   ├── lib/              # AI integrations & Prisma client
+│   └── types/            # TypeScript definitions
+├── public/               # Static assets
+└── .env                  # Environment variables (git-ignored)
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📝 License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Distributed under the MIT License.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built with ❤️ for entrepreneurs everywhere.

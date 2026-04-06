@@ -7,18 +7,27 @@ export async function POST(request: Request) {
     const json = await request.json();
     const { title, description } = json;
 
-    if (!title || typeof title !== 'string' || title.trim() === '') {
+    if (!title || typeof title !== 'string' || title.trim().length < 3) {
       return NextResponse.json(
-        { error: 'Title is required and must not be empty' },
+        { error: 'Title must be at least 3 characters long' },
         { status: 400 }
       );
     }
 
-    if (!description || typeof description !== 'string' || description.trim() === '') {
+    if (!description || typeof description !== 'string' || description.trim().length < 10) {
       return NextResponse.json(
-        { error: 'Description is required and must not be empty' },
+        { error: 'Description must be at least 10 characters long' },
         { status: 400 }
       );
+    }
+
+    // Check for API key availability based on provider
+    const provider = process.env.AI_PROVIDER || 'gemini';
+    const apiKey = provider === 'groq' ? process.env.GROQ_API_KEY : process.env.GEMINI_API_KEY;
+    
+    if (!apiKey) {
+      console.warn(`Warning: AI_PROVIDER is set to ${provider} but the corresponding API key is missing.`);
+      // We continue anyway, the analysis block will handle the error gracefully
     }
 
     const idea = await prisma.idea.create({
@@ -28,32 +37,34 @@ export async function POST(request: Request) {
       },
     });
 
+    // Run AI analysis
     try {
       const analysisData = await extractStartupAnalysis(idea.title, idea.description);
 
       await prisma.analysis.create({
         data: {
           ideaId: idea.id,
-          problem: analysisData.problem || '',
-          customer: analysisData.customer || '',
-          market: analysisData.market || '',
-          competitor: analysisData.competitor ? JSON.parse(JSON.stringify(analysisData.competitor)) : [],
-          tech_stack: analysisData.tech_stack ? JSON.parse(JSON.stringify(analysisData.tech_stack)) : [],
+          problem: analysisData.problem || 'Analysis pending',
+          customer: analysisData.customer || 'Analysis pending',
+          market: analysisData.market || 'Analysis pending',
+          competitor: analysisData.competitor || [],
+          tech_stack: analysisData.tech_stack || [],
           risk_level: analysisData.risk_level || 'Unknown',
           profitability_score: analysisData.profitability_score || 0,
-          justification: analysisData.justification || ''
+          justification: analysisData.justification || 'Analysis failed or was skipped'
         }
       });
     } catch (aiError) {
-      console.error("Non-fatal AI processing error for idea", idea.id, aiError);
-      // Gracefully fallback: Return the idea even if AI processing fails on network limit or syntax layer
+      console.error(`AI processing failed for idea ${idea.id}:`, aiError instanceof Error ? aiError.message : aiError);
+      // Non-fatal: the idea is already in the DB, analysis is just missing
     }
 
     return NextResponse.json(idea, { status: 201 });
   } catch (error) {
-    console.error('Failed to create idea:', error);
+    console.error('API Error:', error);
+    const message = error instanceof Error ? error.message : 'Internal server error';
     return NextResponse.json(
-      { error: 'Internal server error while creating idea' },
+      { error: message },
       { status: 500 }
     );
   }
