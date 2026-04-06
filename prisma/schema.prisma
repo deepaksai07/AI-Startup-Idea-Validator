@@ -1,0 +1,30 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Idea {
+  id          String     @id @default(uuid())
+  title       String
+  description String
+  createdAt   DateTime   @default(now())
+  analysis    Analysis?
+}
+
+model Analysis {
+  id                   String   @id @default(uuid())
+  ideaId               String   @unique
+  idea                 Idea     @relation(fields: [ideaId], references: [id])
+  problem              String
+  customer             String
+  market               String
+  competitor           Json
+  tech_stack           Json
+  risk_level           String
+  profitability_score  Int
+  justification        String
+}
