@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
@@ -44,25 +44,37 @@ export function IdeaForm() {
   };
 
   return (
-    <GlassCard className="max-w-2xl w-full">
+    <GlassCard className="max-w-2xl w-full" noAnimation>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 mb-3">
-            AI Startup Idea Validator
+        {/* Hero heading */}
+        <div className="mb-9 text-center space-y-3">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            className="inline-flex items-center gap-2 rounded-full bg-violet-500/10 border border-violet-500/20 px-4 py-1.5 mb-2"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+            <span className="text-violet-300 text-xs font-medium tracking-wide">AI-Powered Analysis</span>
+          </motion.div>
+
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-white/90 to-slate-400">
+            Validate Your Idea
           </h1>
-          <p className="text-slate-400 text-lg">
-            Describe your idea. Let AI do the deep analysis.
+          <p className="text-slate-400 text-base md:text-lg max-w-md mx-auto leading-relaxed">
+            Describe your startup. Our AI gives you instant analysis on market fit, risks, and profitability.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Title input */}
           <div className="space-y-2">
-            <label htmlFor="idea-title" className="text-sm font-medium text-slate-300 block">
-              Startup Title
+            <label htmlFor="idea-title" className="text-sm font-medium text-slate-300 flex items-center gap-1.5">
+              <span className="text-purple-400">01</span> Startup Title
             </label>
             <input
               id="idea-title"
@@ -71,55 +83,75 @@ export function IdeaForm() {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. AI Resume Builder"
               disabled={isLoading}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-200 disabled:opacity-50"
+              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500/40 hover:border-white/15 transition-all duration-200 disabled:opacity-40"
             />
           </div>
 
+          {/* Description textarea */}
           <div className="space-y-2">
-            <label htmlFor="idea-description" className="text-sm font-medium text-slate-300 block">
-              Description
+            <label htmlFor="idea-description" className="text-sm font-medium text-slate-300 flex items-center gap-1.5">
+              <span className="text-purple-400">02</span> Description
             </label>
             <textarea
               id="idea-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe your startup idea in detail — the problem it solves, your target users, and how it works..."
+              placeholder="Describe the problem you solve, who your target users are, and how your product works..."
               disabled={isLoading}
               rows={5}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all duration-200 resize-none disabled:opacity-50"
+              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500/40 hover:border-white/15 transition-all duration-200 resize-none disabled:opacity-40"
             />
           </div>
 
-          {error && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3"
-            >
-              {error}
-            </motion.p>
-          )}
+          {/* Error message */}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 flex items-center gap-2">
+                  <span className="text-red-400">⚠</span> {error}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
+          {/* Submit button */}
           <motion.button
             id="submit-idea-btn"
             type="submit"
             disabled={isLoading}
             whileHover={{ scale: isLoading ? 1 : 1.02 }}
             whileTap={{ scale: isLoading ? 1 : 0.98 }}
-            className="w-full flex items-center justify-center gap-3 rounded-xl font-semibold text-white px-8 py-4
-              bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500
-              shadow-[0_0_20px_rgba(147,51,234,0.3)] hover:shadow-[0_0_30px_rgba(147,51,234,0.5)]
-              transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 rounded-xl font-semibold text-white px-8 py-4 text-base
+              bg-gradient-to-r from-violet-600 to-indigo-600
+              hover:from-violet-500 hover:to-indigo-500
+              shadow-[0_0_24px_rgba(139,92,246,0.35)]
+              hover:shadow-[0_0_40px_rgba(139,92,246,0.55)]
+              active:shadow-[0_0_16px_rgba(139,92,246,0.3)]
+              transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>
                 <LoadingSpinner size="sm" />
-                <span>Analyzing with AI...</span>
+                <span>Analyzing with AI — this may take a moment...</span>
               </>
             ) : (
-              'Validate My Idea →'
+              <>
+                <span>Validate My Idea</span>
+                <span className="text-violet-300">→</span>
+              </>
             )}
           </motion.button>
+
+          {!isLoading && (
+            <p className="text-center text-xs text-slate-600">
+              Powered by Gemini AI · Results appear instantly
+            </p>
+          )}
         </form>
       </motion.div>
     </GlassCard>

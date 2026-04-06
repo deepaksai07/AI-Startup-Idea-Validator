@@ -35,3 +35,39 @@ export async function GET(
     );
   }
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
+
+    if (!id) {
+      return NextResponse.json({ error: 'Idea ID is required' }, { status: 400 });
+    }
+
+    // Since onDelete Cascade is not set in the schema, manually delete Analysis first
+    await prisma.analysis.deleteMany({
+      where: {
+        ideaId: id,
+      },
+    });
+
+    // Delete the Idea itself
+    await prisma.idea.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    console.error(`Failed to delete idea with ID:`, error);
+    return NextResponse.json(
+      { error: 'Internal server error while deleting the idea' },
+      { status: 500 }
+    );
+  }
+}
