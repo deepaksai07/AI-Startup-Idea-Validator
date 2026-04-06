@@ -100,6 +100,18 @@ Visit `http://localhost:3000` to start validating.
 
 ---
 
+## 🎨 Customizing AI Analysis
+
+You can customize how the AI validates ideas without touching any code. 
+
+1.  Open `prompts/system_prompt.txt`.
+2.  Modify the instructions, JSON schema, or constraints.
+3.  Restart the application (or refresh for production).
+
+This is ideal for non-technical users who want to change the analysis criteria, required tech stack, or the number of competitors analyzed.
+
+---
+
 ## 📝 License
 
 Distributed under the MIT License.
