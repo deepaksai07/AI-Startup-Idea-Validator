@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { extractStartupAnalysis } from '@/lib/ai';
 
 export async function POST(request: Request) {
   try {
@@ -26,6 +27,27 @@ export async function POST(request: Request) {
         description: description.trim(),
       },
     });
+
+    try {
+      const analysisData = await extractStartupAnalysis(idea.title, idea.description);
+
+      await prisma.analysis.create({
+        data: {
+          ideaId: idea.id,
+          problem: analysisData.problem || '',
+          customer: analysisData.customer || '',
+          market: analysisData.market || '',
+          competitor: analysisData.competitor ? JSON.parse(JSON.stringify(analysisData.competitor)) : [],
+          tech_stack: analysisData.tech_stack ? JSON.parse(JSON.stringify(analysisData.tech_stack)) : [],
+          risk_level: analysisData.risk_level || 'Unknown',
+          profitability_score: analysisData.profitability_score || 0,
+          justification: analysisData.justification || ''
+        }
+      });
+    } catch (aiError) {
+      console.error("Non-fatal AI processing error for idea", idea.id, aiError);
+      // Gracefully fallback: Return the idea even if AI processing fails on network limit or syntax layer
+    }
 
     return NextResponse.json(idea, { status: 201 });
   } catch (error) {
